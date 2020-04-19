@@ -2252,10 +2252,13 @@ void phydm_get_avg_phystatus_val(void *dm_void)
 			  dbg_avg->rssi_beacon_avg[1]);
 		break;
 #endif
+#if (defined(PHYDM_COMPILE_ABOVE_1SS))
+	case 1:
 		PHYDM_DBG(dm, DBG_CMN, "* %-8s Cnt=((%.3d)) RSSI:{%.2d}\n",
 			  "[Beacon]", dbg_s->rssi_beacon_cnt,
 			  dbg_avg->rssi_beacon_avg[0]);
 		break;
+#endif
 	}
 
 	/*@===[CCK]===*/

@@ -1,2 +1,8 @@
 *.o
 *.d
+*.cmd
+*.mod
+*.ko
+8821cu.mod.c
+Module.symvers
+modules.order

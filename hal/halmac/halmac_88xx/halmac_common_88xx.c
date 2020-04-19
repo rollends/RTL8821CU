@@ -565,6 +565,9 @@ set_hw_value_88xx(struct halmac_adapter *adapter, enum halmac_hw_id hw_id,
 	case HALMAC_HW_TXFIFO_LIFETIME:
 		cfg_txfifo_lt_88xx(adapter,
 				   (struct halmac_txfifo_lifetime_cfg *)value);
+		// FIX: Why is this a fall through in the original code?
+		// Going to break here.
+		break;
 	default:
 		return HALMAC_RET_PARA_NOT_SUPPORT;
 	}
