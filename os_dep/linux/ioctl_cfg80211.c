@@ -423,8 +423,17 @@ bool rtw_cfg80211_allow_ch_switch_notify(_adapter *adapter)
 #endif
 	return 1;
 }
-
-u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 ht)
+/*
+u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 ht
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0))
+	, boolean started
+#endif
+)*/
+u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 ht
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0))
+	, u8 started
+#endif
+)
 {
 	struct wiphy *wiphy = adapter_to_wiphy(adapter);
 	u8 ret = _SUCCESS;
@@ -432,12 +441,21 @@ u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
 	struct cfg80211_chan_def chdef;
 
-	if (!rtw_cfg80211_allow_ch_switch_notify(adapter))
-		goto exit;
-
 	ret = rtw_chbw_to_cfg80211_chan_def(wiphy, &chdef, ch, bw, offset, ht);
 	if (ret != _SUCCESS)
 		goto exit;
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0))
+// Inspired by Patch @ https://github.com/RinCat/RTL88x2BU-Linux-Driver/commit/3e20e8864de8a7b9ebb65eccd841b60757e5628d
+	if (started) {
+		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0);
+		goto exit;
+	}
+#endif
+
+	if (!rtw_cfg80211_allow_ch_switch_notify(adapter))
+		goto exit;
+
 
 	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef);
 
